@@ -35,18 +35,23 @@ def done(bot, update):
 
 
 def echo(bot, update):
+    chat = update.message.chat_id
     text = update.message.text
-    assignments = [hw for hw, in session.query(Assignment.assignment)]
+    assignments = [hw for hw, in session.query(
+        Assignment.assignment).filter(Assignment.owner == chat)]
     if text in assignments:
-        session.query(Assignment).filter(Assignment.assignment == text).delete()
+        session.query(Assignment).filter(Assignment.assignment == text,
+                                         Assignment.owner == chat).delete()
         session.commit()
-        bot.send_message(chat_id=update.message.chat_id,
-                         text=f"Removed *{text}* from your list of assignments")
-        assignments = [hw for hw, in session.query(Assignment.assignment)]
+        bot.send_message(chat_id=chat,
+                         text=f'Removed "{text}" from your list of assignments')
+        assignments = [hw for hw, in session.query(
+            Assignment.assignment).filter(Assignment.owner == chat)]
     else:
-        session.add(Assignment(assignment=text))
+        session.add(Assignment(assignment=text, owner=chat))
         session.commit()
-        assignments = [hw for hw, in session.query(Assignment.assignment)]
+        assignments = [hw for hw, in session.query(
+            Assignment.assignment).filter(Assignment.owner == chat)]
 
     complete = '\n'.join(assignments)
     bot.send_message(chat_id=update.message.chat_id,
