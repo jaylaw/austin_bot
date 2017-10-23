@@ -15,9 +15,6 @@ map_tables(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
 
-updater = Updater(token=settings.TOKEN)
-dispatcher = updater.dispatcher
-
 
 # Callback function for the /start CommandHandler
 def start(bot, update):
@@ -96,6 +93,13 @@ def get_user_assignments(owner):
 
 
 def main():
+    # Create the Updater and pass it your bot's token.
+    updater = Updater(token=settings.TOKEN)
+
+    # Get the dispatcher to register handlers.
+    dispatcher = updater.dispatcher
+
+    # Add start command handler to collect user data.
     start_handler = CommandHandler('start', start)
     echo_handler = MessageHandler(Filters.text, echo)
     done_handler = CommandHandler('done', done)
@@ -104,7 +108,13 @@ def main():
     dispatcher.add_handler(echo_handler)
     dispatcher.add_handler(done_handler)
 
+    # Start the Bot.
     updater.start_polling()
+
+    # Run the bot until you press Ctrl-C or the process receives SIGINT,
+    # SIGTERM or SIGABRT. This should be used most of the time, since
+    # start_polling() is non-blocking and will stop the bot gracefully.
+    updater.idle()
 
 
 if __name__ == '__main__':
