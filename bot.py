@@ -1,5 +1,5 @@
 from sqlalchemy.orm import sessionmaker
-from models import db_connect, map_tables, Assignment
+from models import db_connect, map_tables, Assignment, User
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import ReplyKeyboardMarkup
 
@@ -21,6 +21,14 @@ dispatcher = updater.dispatcher
 
 # Callback function for the /start CommandHandler
 def start(bot, update):
+    user_data = update.message.from_user
+    session.add(User(id=user_data.id,
+                     is_bot=user_data.is_bot,
+                     first_name=user_data.first_name,
+                     last_name=user_data.last_name,
+                     username=user_data.username,
+                     language_code=user_data.language_code))
+    session.commit()
     bot.send_message(chat_id=update.message.chat_id,
                      text="I'm a bot, please talk to me!")
 
