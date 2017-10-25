@@ -1,3 +1,8 @@
+#!/usr/bin/env python
+""" A simple Telegram Bot Template
+
+"""
+
 from sqlalchemy.orm import sessionmaker
 from models import db_connect, map_tables, Assignment, User
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
