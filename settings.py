@@ -5,7 +5,7 @@ DATABASE = {
     'host': 'localhost',
     'port': '5432',
     'username': 'webadmin',
-    'password': '***REMOVED***',
+    'password': 'jaylaw48',
     'database': 'test'
 }
 

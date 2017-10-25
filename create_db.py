@@ -21,7 +21,7 @@ from sqlalchemy.pool import NullPool
 # and has CREATE DATABASE permissions, rather than use a superuser.
 DB_CONFIG_DICT = {
     'user': 'webadmin',
-    'password': '***REMOVED***',
+    'password': 'jaylaw48',
     'host': 'localhost',
     'port': 5432,
 }
