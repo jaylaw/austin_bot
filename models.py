@@ -35,5 +35,7 @@ class User(Base):
 class Assignment(Base):
     __tablename__ = 'assignments'
 
-    assignment = Column('assignment', Text,
-                        primary_key=True, nullable=False)
+    hw_id = Column('hw_id', Integer,
+                   primary_key=True, nullable=False)
+    owner = Column('chat_id', Integer, nullable=False)
+    assignment = Column('assignment', Text, nullable=False)
