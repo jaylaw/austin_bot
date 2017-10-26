@@ -1,10 +1,10 @@
 #!/usr/bin/env python
-""" A simple Telegram Bot Template
+""" A Telegram Bot application to track homework assignments."
 
 """
 
 from sqlalchemy.orm import sessionmaker
-from models import db_connect, map_tables, Assignment, User
+from models import db_connect, map_tables, Assignment
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import ReplyKeyboardMarkup
 
@@ -23,8 +23,17 @@ session = Session()
 
 # Callback function for the /start CommandHandler
 def start(bot, update):
+    greet_user_name = update.message.from_user.first_name
     bot.send_message(chat_id=update.message.chat_id,
-                     text="I'm a bot, please talk to me!")
+                     text=("Hi {}! I'm here to help you keep track of your "
+                           "homework assignments. \n\n"
+                           "To get started, just send me an assignment. It's "
+                           "that simple! \n\n"
+                           "After you've finished an assignment send /done "
+                           "to remove it from the list."
+                           ).format(
+                         greet_user_name)
+                     )
 
 
 # Callback function for the /done CommandHandler
@@ -49,7 +58,10 @@ def echo(bot, update):
                                          Assignment.owner == chat).delete()
         session.commit()
         bot.send_message(chat_id=chat,
-                         text=f'Removed "{text}" from your list of assignments')
+                         text=('Removed "{0}" from your list of assignments'
+                               .format(text)
+                               )
+                         )
         assignments = get_user_assignments(chat)
     else:
         session.add(Assignment(assignment=text, owner=chat))
