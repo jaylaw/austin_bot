@@ -1,10 +1,28 @@
-from sqlalchemy import create_engine, Column, Integer, Boolean, String, Text
+from sqlalchemy import (create_engine, Column, Integer, Boolean, String, Text,
+                        DateTime)
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import func
 from sqlalchemy.engine.url import URL
 
 import settings
 
 Base = declarative_base()
+
+
+# class DataAccessLayer:
+#
+#     def __init__(self):
+#         self.engine = None
+#         self.connection_string = URL(**settings.DATABASE)
+#
+#     def connect(self):
+#         self.engine = create_engine(self.connection_string, echo=True)
+#         Base.metadata.create_all(self.engine)
+#         self.Session = sessionmaker(bind=self.engine)
+#
+#
+# db = DataAccessLayer()
 
 
 def db_connect():
@@ -38,4 +56,12 @@ class Assignment(Base):
     hw_id = Column('hw_id', Integer,
                    primary_key=True, nullable=False)
     owner = Column('chat_id', Integer, nullable=False)
+    class_id = Column('class', String(length=50))
     assignment = Column('assignment', Text, nullable=False)
+    due_date = Column('due_date', DateTime(timezone=True))
+    complete = Column('complete', Boolean)
+    time_created = Column(DateTime(timezone=True),
+                          server_default=func.statement_timestamp(),
+                          nullable=False)
+    time_updated = Column(DateTime(timezone=True),
+                          onupdate=func.clock_timestamp())
