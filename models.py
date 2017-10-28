@@ -1,36 +1,10 @@
-from sqlalchemy import (create_engine, Column, Integer, Boolean, String, Text,
-                        DateTime)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session
 from sqlalchemy.sql import func
-from sqlalchemy.engine.url import URL
+from sqlalchemy import (Column, Integer, Boolean, String, Text,
+                        DateTime)
 
-import settings
 
 Base = declarative_base()
-
-
-# class DataAccessLayer:
-#
-#     def __init__(self):
-#         self.engine = None
-#         self.connection_string = URL(**settings.DATABASE)
-#
-#     def connect(self):
-#         self.engine = create_engine(self.connection_string, echo=True)
-#         Base.metadata.create_all(self.engine)
-#         self.Session = sessionmaker(bind=self.engine)
-#
-#
-# db = DataAccessLayer()
-
-
-def db_connect():
-    return create_engine(URL(**settings.DATABASE), echo=True)
-
-
-def map_tables(engine):
-    Base.metadata.create_all(engine)
 
 
 class User(Base):
@@ -59,7 +33,7 @@ class Assignment(Base):
     class_id = Column('class', String(length=50))
     assignment = Column('assignment', Text, nullable=False)
     due_date = Column('due_date', DateTime(timezone=True))
-    complete = Column('complete', Boolean)
+    complete = Column('complete', Boolean, default=False)
     time_created = Column(DateTime(timezone=True),
                           server_default=func.statement_timestamp(),
                           nullable=False)
