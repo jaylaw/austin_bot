@@ -1,24 +1,17 @@
 #!/usr/bin/env python
-""" A Telegram Bot application to track homework assignments."
-
-"""
-
-from sqlalchemy.orm import sessionmaker
-from models import db_connect, map_tables, Assignment
+import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import ReplyKeyboardMarkup
+from database import Database
+from models import Assignment
 
-import logging
 import settings
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO)
 
-engine = db_connect()
-map_tables(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
+db = Database()
 
 
 # Callback function for the /start CommandHandler
@@ -38,39 +31,34 @@ def start(bot, update):
 
 # Callback function for the /done CommandHandler
 def done(bot, update):
-    chat = update.message.chat_id
-    assignments = get_user_assignments(chat)
+    student = update.message.chat_id
+    work_list = [hw.assignment for hw in db.due_assignments(student)]
     reply_markup = ReplyKeyboardMarkup(
-        build_menu(get_data_buttons(assignments),
+        build_menu(get_data_buttons(work_list),
                    n_cols=2), one_time_keyboard=True)
-    bot.send_message(chat_id=chat,
+    bot.send_message(chat_id=student,
                      text="Which item did you complete?",
                      reply_markup=reply_markup)
 
 
 # Callback function for the /echo MessageHandler
 def echo(bot, update):
-    chat = update.message.chat_id
+    student = update.message.chat_id
     text = update.message.text
-    assignments = get_user_assignments(chat)
-    if text in assignments:
-        session.query(Assignment).filter(Assignment.assignment == text,
-                                         Assignment.owner == chat).delete()
-        session.commit()
-        bot.send_message(chat_id=chat,
-                         text=('Removed "{0}" from your list of assignments'
+    match = db.process_homework(student, text)
+    if match is True:
+        bot.send_message(chat_id=student,
+                         text=('Added "{}" to your completed assignments!'
                                .format(text)
                                )
                          )
-        assignments = get_user_assignments(chat)
+        work_list = [hw.assignment for hw in db.due_assignments(student)]
     else:
-        session.add(Assignment(assignment=text, owner=chat))
-        session.commit()
-        assignments = get_user_assignments(chat)
+        work_list = [hw.assignment for hw in db.due_assignments(student)]
 
-    complete = '\n'.join(assignments)
-    bot.send_message(chat_id=chat,
-                     text=complete)
+    echo_message = '\n'.join(work_list)
+    bot.send_message(chat_id=student,
+                     text=echo_message)
 
 
 # Helper function to build ReplyMarkupKeyboard
@@ -93,12 +81,12 @@ def get_data_buttons(data):
 
 
 # Helper function to get homework assignments for owner.
-def get_user_assignments(owner):
-    homework = []
-    for hw, in session.query(
-            Assignment.assignment).filter(Assignment.owner == owner):
-        homework.append(hw)
-    return homework
+# def get_user_assignments(owner):
+#     homework = []
+#     for hw, in session.query(
+#             Assignment.assignment).filter(Assignment.owner == owner):
+#         homework.append(hw)
+#     return homework
 
 
 def main():
