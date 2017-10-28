@@ -47,31 +47,31 @@ class Database:
         self.session.commit()
         self.session.close()
 
-    def complete_student_assignment(self, homework):
-        homework.complete = True
-        self.session.commit()
+    def get_all_assignments(self, student):
+        all_assignments = (self.session.query(Assignment).filter(
+            Assignment.owner == student))
         self.session.close()
+        return all_assignments
 
-    def due_assignments(self, student):
+    def get_due_assignments(self, student):
         open_assignments = (self.session.query(Assignment).filter(
             Assignment.owner == student).filter(
             Assignment.complete.is_(False)).all())
         self.session.close()
         return open_assignments
 
+    def update_complete_assignment(self, homework):
+        homework.complete = True
+        self.session.commit()
+        self.session.close()
+
     def process_homework(self, student, homework):
         match = (self.session.query(Assignment).filter(
             Assignment.owner == student,
             Assignment.assignment == homework).one_or_none())
         if match:
-            self.complete_student_assignment(match)
+            self.update_complete_assignment(match)
             return True
         else:
             self.add_new_assignment(student, homework)
             return None
-
-    def get_all_assignments(self, student):
-        all_assignments = (self.session.query(Assignment).filter(
-            Assignment.owner == student))
-        self.session.close()
-        return all_assignments

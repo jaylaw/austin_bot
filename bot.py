@@ -3,7 +3,6 @@ import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import ReplyKeyboardMarkup
 from database import Database
-from models import Assignment
 
 import settings
 
@@ -32,7 +31,7 @@ def start(bot, update):
 # Callback function for the /done CommandHandler
 def done(bot, update):
     student = update.message.chat_id
-    work_list = [hw.assignment for hw in db.due_assignments(student)]
+    work_list = [hw.assignment for hw in db.get_due_assignments(student)]
     reply_markup = ReplyKeyboardMarkup(
         build_menu(get_data_buttons(work_list),
                    n_cols=2), one_time_keyboard=True)
@@ -52,9 +51,9 @@ def echo(bot, update):
                                .format(text)
                                )
                          )
-        work_list = [hw.assignment for hw in db.due_assignments(student)]
+        work_list = [hw.assignment for hw in db.get_due_assignments(student)]
     else:
-        work_list = [hw.assignment for hw in db.due_assignments(student)]
+        work_list = [hw.assignment for hw in db.get_due_assignments(student)]
 
     echo_message = '\n'.join(work_list)
     bot.send_message(chat_id=student,
