@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+# v0.1.1
+
 import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram import ReplyKeyboardMarkup
