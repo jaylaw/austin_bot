@@ -2,9 +2,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from sqlalchemy.orm import sessionmaker
 
-import settings
-
+import os
+import sys
 from models import *
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_DIR = os.path.join(BASE_DIR, 'ab_settings')
+sys.path.append(CONFIG_DIR)
+
+import settings
 
 Session = sessionmaker()
 """
