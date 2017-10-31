@@ -5,11 +5,18 @@
 
 # v0.1.1
 # fix merge
+
+from telegram import ReplyKeyboardMarkup
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from database import Database
+
+import os
+import sys
 import logging
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from telegram import ReplyKeyboardMarkup
-from database import Database
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CONFIG_DIR = os.path.join(BASE_DIR, 'ab_settings')
+sys.path.append(CONFIG_DIR)
 
 import settings
 
