@@ -42,7 +42,7 @@ class Database:
         contains sensitive info we need to find a way to secure the password
         :return:
         """
-        return create_engine(URL(**settings.DATABASE), echo=True)
+        return create_engine(URL(**settings.DATABASE))
 
     def initialize_schema(self, engine):
         Base.metadata.create_all(engine)
